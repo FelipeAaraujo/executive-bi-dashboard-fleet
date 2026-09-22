@@ -1,42 +1,44 @@
-# Fleet & Logistics Analytics
+# Executive BI Dashboard & Automation
 
-**Excel/Power Query → SQL → Power BI — identificando quais veículos da frota dão prejuízo**
+**Python (pipeline) + SQL + Power BI — de 3 fontes de dado separadas a um painel único, atualizado automaticamente**
 
 ## Contexto
-A RotaViva Logística (transportadora fictícia de combustíveis) opera 60 caminhões-tanque em 4
-regiões do Brasil. A gestão "sente" que a frota está subutilizada, mas não sabe apontar quais
-veículos, especificamente, geram o problema.
+A diretoria da RotaViva recebia relatório mensal montado manualmente em Excel, juntando dados de
+frota (Projeto 1), rentabilidade por rota (Projeto 2) e previsão de demanda (Projeto 5) em
+planilhas separadas — processo lento e sujeito a erro humano.
 
 ## Problema de negócio
-Identificar veículos improdutivos, custos elevados e baixa disponibilidade — e transformar isso em
-recomendação de manutenção/realocação.
+Consolidar as três fontes num único pipeline automatizado (extract → transform → load) e entregar
+um painel executivo de uma tela só, sem depender de trabalho manual mensal.
 
-## Base de dados (gerada para este projeto)
-- **21.719 viagens**, 60 veículos, 112 eventos de manutenção, 12 meses (jan–dez/2025).
-- Arquivos: `veiculos.csv`, `viagens.csv`, `manutencoes.csv`.
-- Dicionário de dados completo em `dicionario_dados.md`.
+## O que foi consolidado
+- Dados de frota e manutenção (Projeto 1: 21.719 viagens, 60 veículos).
+- Dados de rentabilidade por rota (Projeto 2: 20.173 viagens, 25 rotas).
+- Previsão de demanda por região (Projeto 5).
 
-## Tratamento dos dados
-Cálculo de custo por km, custo por m³, margem por viagem e índice de disponibilidade a partir dos
-dados brutos de viagem e manutenção.
+## Pipeline (`consolidate.py`)
+Script Python único que lê as 3 fontes, aplica as transformações (padronização, cálculo de custo
+total e margem, agregação mensal) e grava um modelo dimensional simplificado (fato de viagens +
+KPIs mensais), pronto para o Power BI consumir.
 
-## Análise
-Quais veículos têm custo por km acima da média da frota? Existe relação entre manutenção
-recorrente e baixa disponibilidade?
-
-## Resultado (calculado sobre a base gerada, não estimado)
-- **9 dos 60 veículos (15% da frota) respondem por 45,2% do custo total de manutenção** da frota,
-  com disponibilidade média de **90,4%** contra **93,8%** da frota — um gap real de 3,4 p.p.
-- Se esses 9 veículos caíssem ao custo de manutenção mediano dos demais 51, a economia estimada é
-  de **R$ 251.541,56/ano (37% do custo total de manutenção da frota)**.
-- Custo por km médio da frota: R$ 2,06.
+## Resultado (medido na execução real do pipeline)
+- **Pipeline executado ponta a ponta em 0,74 segundos**, consolidando as 3 fontes automaticamente
+  — elimina o trabalho manual de juntar planilhas mês a mês.
+- KPIs executivos consolidados e recalculados automaticamente a cada rodada: faturamento mensal
+  (R$ 6,0M–6,6M), margem consolidada estável em **~80%**, disponibilidade média da frota de
+  **94,0%**, custo de manutenção total de **R$ 679.218,55** no período.
+- O painel evidencia que os mesmos veículos problemáticos identificados no Projeto 1 (custo de
+  manutenção) também aparecem entre os de rota menos rentável do Projeto 2 — uma correlação que só
+  fica visível quando os dados são vistos juntos, não em relatórios separados.
 
 ## Recomendação
-Priorizar manutenção preventiva ou substituição desses 9 veículos; realocar rotas mais longas para
-os veículos de maior disponibilidade.
+Tratar os veículos que aparecem simultaneamente nos alertas de manutenção e de baixa rentabilidade
+como prioridade única e transversal, em vez de decisões isoladas por área.
 
 ## Ferramentas
-Excel/Power Query (exploração inicial) → SQL (agregações) → Power BI (dashboard executivo).
+Python (pipeline de consolidação), SQL, Power BI (camada de apresentação).
 
 ## Competências demonstradas
-Tratamento de dados, modelagem simples, SQL, DAX, storytelling executivo, KPIs operacionais.
+Automação de pipeline (ETL simplificado), modelagem dimensional, integração de múltiplas fontes,
+storytelling executivo orientado a dado real e mensurável.
+
